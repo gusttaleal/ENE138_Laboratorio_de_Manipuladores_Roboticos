@@ -1,3 +1,7 @@
+%##########################################################################
+%#               UNIVERSIDADE FEDERAL DE JUIZ DE FORA                     #
+%#              GUSTAVO LEAL SILVA E SOUZA - 201469055B                   #
+%##########################################################################
 clear; clc; close all; disp('Program Started');
 
 vrep=remApi('remoteApi');

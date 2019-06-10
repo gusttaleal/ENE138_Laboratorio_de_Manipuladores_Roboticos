@@ -1,3 +1,7 @@
+%##########################################################################
+%#               UNIVERSIDADE FEDERAL DE JUIZ DE FORA                     #
+%#              GUSTAVO LEAL SILVA E SOUZA - 201469055B                   #
+%##########################################################################
 function [TH1u , TH2u , TH1d , TH2d] = InvKinematic(X, Y, L1, L2, C)
     TH1u = zeros(1,C);  TH2u = zeros(1,C);
     TH1d = zeros(1,C);  TH2d = zeros(1,C);

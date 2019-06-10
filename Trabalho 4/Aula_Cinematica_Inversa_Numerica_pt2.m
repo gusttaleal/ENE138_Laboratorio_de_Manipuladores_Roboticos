@@ -22,45 +22,62 @@ if (clientID>-1)
     [~, EndEffector]=vrep.simxGetObjectHandle...
         (clientID,'EndEffector',vrep.simx_opmode_blocking);
     
-    % Ângulos iniciais das juntas
-    TH = [ 0 ; 0 ];
-    t1 = TH(1);
-    t2 = TH(2);
-    
     % Tamanho dos links
     L1 = 0.1;   L2 = 0.1;
     
+    % Ângulos iniciais das juntas
+    TH = [ 0 ; 0 ];
+    
+    % Função para aquisição da posição atual do manipulador
+    P = Pos(TH, L1, L2);
+    
     % Conjunto de pontos objetivo
-    G = [ 0.1 ; 0.1 ];
+    G = [ 0.05 ; 0.07 ];
+    
+    % Erro
+    E = G - P;
+    
+    % Erro quadratico médio
+    EQM = sqrt( E' * E );
     
     % Constantes de treinamento
     Eta = 1e-3;
     Csi = 1e-6;
     
-    % Função para aquisição da posição atual do manipulador
-    P = Pos(TH, L1, L2);
+    % Ganhos da matriz K
+    K = [ 1e3 , 0 ; 0 , 1e3 ];
     
-    % Cálculo do erro médio quadratico
-    EQM = 0.5 * ( G - P )' * ( G - P );
+    % Porção de tempo
+    dTime = 0.01;
     
     while( EQM > Csi )
-        %
-        dEQM = -( G - P );
+        % Inicia o contador
+        tic
+        
+        % Erro
+        E = G - P;
+        
+        % Erro quadratico médio
+        EQM = sqrt( E' * E );
         
         % Aquisição do Jacobiano da função f(Th1 , Th2)
         J = Jacobinano_planar(TH, L1, L2);
         
         %
-        dTH = pinv(J) * dEQM; % Problema aqui
+        dq = J' * ( K * E );
         
-        % Atualização dos ângulos thetas
-        TH = TH - ( Eta * dTH );
+        % Integral de Euler
+        TH = TH + ( dq * dTime );
+        
+        % Tempo atual
+        t = toc;
+        
+        % Tempo de cada ação
+        pause(dTime - t);
         
         % Função para aquisição da posição atual do manipulador
         P = Pos(TH, L1, L2);
         
-        % Cálculo do erro médio quadratico
-        EQM = 0.5 * ( G - P )' * ( G - P );
     end
     
     rad2deg(TH)
